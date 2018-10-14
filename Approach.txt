@@ -1,0 +1,14 @@
+Kaggle’s DataScience bowl 2018 : To detect the nuclei in divergent images of biological cells. 
+
+Problem Description: Given several segmented nuclei images of biological cells and multiple images of masks per cell image, depicting the cell’s nuclei, the task is to train a model which would detect nuclei in unseen images of cells and report them as run length encoded pixels. 
+
+Approach: Using a state of the art neural network for biological images, UNET for identification of nuclei in the test data.
+
+Detailed Approach:
+
+Read all cell images and the corresponding masks in training data, resize them all to some specified dimension (here, 256 * 256), across all channels. Test images are also resized.   All images are stored as numpy arrays. Images of cells which serve as the training data are stored as ‘uint8’ while Images of masks which serve as label data are stored as boolean array (as the masks only indicated the presence or absence of a nuclei pixel) 
+Define a neural network based architecture for nuclei detection. We use a 9 layered UNET for the purpose.  UNET has proved to be very effective in biological imaging. We have 5 layers of downscaling and 4 of upscaling. Readers can experiment by alerting the architecture by introducing more layers.   Refer : https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/ 
+The model has been compiled using adam’s optimiser, binary cross entropy loss and IoU (Intersection over Union) metric.  We provide another loss metric, bce_dice_loss, to experiment with.  IoU is a metric used to calculate the accuracy of an object detector on a particular image dataset. There might be a number of bounding boxes which could have detected the object, IoU finds the most accurate one. It does so by calculating the ratio of, the area of intersection of a bounding box with the box depicting the ground reality, to the union of the area of the two boxes. The bounding box with the maximum ratio is the most accurate one.  
+Once compiled, the model can be trained. The code has 2 ways of training the model, one using augmentation and one without it.  Augmentation is particularly useful when training models on image data, when we wish to increase the number of training examples. This process uses the existing images in the training data and creates more training examples using flips, translations, rotations etc. 
+The trained model is now used to predict the test samples. The test samples are upscaled to original dimensions, which is important before run length encoding can be done.   
+The pixel values of identified nuclei are then reported using run length encoding.
